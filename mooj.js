@@ -51,7 +51,7 @@ Native.implement([Element, Document, Window], {
 		var removeOne = function(){
 			this.removeEvent(type, fn).removeEvent(type, removeOne);
 		}
-		return this.addEvents(type, fn).addEvent(type, removeOne);
+		return this.addEvent(type, fn).addEvent(type, removeOne);
 	},
 	
 	trigger: function(type, args){
