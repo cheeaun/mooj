@@ -330,7 +330,7 @@ Element.implement({
 		if (this.getStyle('display')=='none')
 			if (speed){
 				var size = this.setStyles({'width': 'auto', 'height': 'auto'}).getStyles('width', 'height');
-				console.log(size);
+//				console.log(size);
 				var options = {duration: speed};
 				if (fn) options['onComplete'] = function(){
 					fn.attempt(this, this);
