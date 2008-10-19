@@ -2,7 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Mooj</title>
-<script type="text/javascript" src="mootools-1.2-core-nc.js"></script>
+<script type="text/javascript" src="mootools-1.2.1-core-nc.js"></script>
+<script type="text/javascript" src="mootools-1.2.1-more-nc.js"></script>
 <script type="text/javascript" src="highlight.js"></script>
 <script type="text/javascript" src="mooj.js"></script>
 <script type="text/javascript" src="site.js"></script>
@@ -430,12 +431,104 @@ window.unload(function(){
 
 <h3>Basics</h3>
 <div id="ex-8.1" class="section">
-	<h4>Example 8.1: ready</h4>
+	<h4>Example 8.1: show, hide, toggle</h4>
 	<div class="example-block">
-		<div id="ex-8.1-1" style="display: none;">Example text</div>
+		<div id="ex-8.1-1" style="display: none; background-color: yellow; border: 2px solid orange;">Example text 1</div>
+		<div id="ex-8.1-2" style="background-color: yellow; border: 2px solid orange;">Example text 2</div>
 	</div>
 	<pre><code class="javascript">$('ex-8.1-1').show();</code></pre>
 	<pre><code class="javascript">$('ex-8.1-1').show('slow');</code></pre>
+	<pre><code class="javascript">$('ex-8.1-1').show(2000, function(){
+	alert('show!');
+});</code></pre>
+	<pre><code class="javascript">$('ex-8.1-2').hide();</code></pre>
+	<pre><code class="javascript">$('ex-8.1-2').hide('slow');</code></pre>
+	<pre><code class="javascript">$('ex-8.1-2').hide(2000, function(){
+	alert('hide!');
+});</code></pre>
+	<pre><code class="javascript">$('ex-8.1-1').toggle();</code></pre>
+</div>
+
+<h3>Sliding</h3>
+<div id="ex-8.2" class="section">
+	<h4>Example 8.2: slide*</h4>
+	<div class="example-block">
+		<div id="ex-8.2-1" style="display: none; background-color: yellow; border: 2px solid orange;">Example text 1</div>
+		<div id="ex-8.2-2" style="background-color: yellow; border: 2px solid orange;">Example text 2</div>
+	</div>
+	<pre><code class="javascript">$('ex-8.2-1').slideDown();</code></pre>
+	<pre><code class="javascript">$('ex-8.2-1').slideDown('slow');</code></pre>
+	<pre><code class="javascript">$('ex-8.2-1').slideDown(2000, function(){
+	alert('slideDown!');
+});</code></pre>
+	<pre><code class="javascript">$('ex-8.2-2').slideUp();</code></pre>
+	<pre><code class="javascript">$('ex-8.2-2').slideUp('slow');</code></pre>
+	<pre><code class="javascript">$('ex-8.2-2').slideUp(2000, function(){
+	alert('slideUp!');
+});</code></pre>
+	<pre><code class="javascript">$('ex-8.2-2').slideToggle();</code></pre>
+</div>
+
+<h3>Fading</h3>
+<div id="ex-8.3" class="section">
+	<h4>Example 8.3: fade*</h4>
+	<div class="example-block">
+		<div id="ex-8.3-1" style="display: none; background-color: yellow; border: 2px solid orange;">Example text 1</div>
+		<div id="ex-8.3-2" style="background-color: yellow; border: 2px solid orange;">Example text 2</div>
+	</div>
+	<pre><code class="javascript">$('ex-8.3-1').fadeIn();</code></pre>
+	<pre><code class="javascript">$('ex-8.3-1').fadeIn('slow');</code></pre>
+	<pre><code class="javascript">$('ex-8.3-1').fadeIn(2000, function(){
+	alert('fadeIn!');
+});</code></pre>
+	<pre><code class="javascript">$('ex-8.3-2').fadeOut();</code></pre>
+	<pre><code class="javascript">$('ex-8.3-2').fadeOut('slow');</code></pre>
+	<pre><code class="javascript">$('ex-8.3-2').fadeOut(2000, function(){
+	alert('fadeOut!');
+});</code></pre>
+	<pre><code class="javascript">$('ex-8.3-2').fadeTo(1000, 0.7);</code></pre>
+	<pre><code class="javascript">$('ex-8.3-2').fadeTo(3000, 0.3, function(){
+	alert('fadeTo');
+});</code></pre>
+</div>
+
+<h3>Custom</h3>
+<div id="ex-8.4" class="section">
+	<p>Note: <code class="javascript">stop()</code>, <code class="javascript">queue()</code> and <code class="javascript">dequeue()</code> are not implemented.</p>
+	<h4>Example 8.4: animate</h4>
+	<div class="example-block">
+		<div id="ex-8.4-1">Example text 1</div>
+	</div>
+	<pre><code class="javascript">$('ex-8.4-1').animate({
+	width: 200,
+	color: '#f00',
+	'background-color': '#eee'
+});</code></pre>
+	<pre><code class="javascript">$('ex-8.4-1').animate({
+	height: 150,
+	color: '#0f0',
+	'background-color': '#333'
+}, 2000);</code></pre>
+	<pre><code class="javascript">$('ex-8.4-1').animate({
+	'margin-left': 200,
+	color: '#00f',
+	'background-color': '#aaa'
+}, 'slow', 'elastic:out');</code></pre>
+	<pre><code class="javascript">$('ex-8.4-1').animate({
+	'margin-top': 200,
+	color: '#0ff',
+	'background-color': '#fff'
+}, 3000, 'bounce:out', function(){
+	alert('animate!');
+});</code></pre>
+	<pre><code class="javascript">$('ex-8.4-1').animate({
+	'padding': 20,
+	color: '#ff0',
+	'background-color': '#000'
+}, {
+	duration: 3000,
+	transition: 'circ:out'
+});</code></pre>
 </div>
 
 <div id="debug">

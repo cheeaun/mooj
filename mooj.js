@@ -1,3 +1,19 @@
+// a copy of jQuery.swap()
+// A method for quickly swapping in/out CSS properties to get correct calculations
+function $swap(el, options, fn){
+	var old = {};
+	// Remember the old values, and insert the new ones
+	for (var name in options){
+		old[name] = el.style[name];
+		el.style[name] = options[name];
+	}
+
+	fn.call(el);
+
+	// Revert the old values
+	for(var name in options) el.style[name] = old[name];
+};
+	
 Native.implement([Window, Document], {
 
 	/*****   EVENTS   *****/
@@ -79,7 +95,7 @@ Native.implement([Element, Document, Window], {
 	type.each(function(name){
 		if (!Native[name]) methods[name] = function(fn){
 			var un_name = name.replace('_', '');
-			return $defined(fn) ? this.addEvent(un_name, fn) : this.fireEvent(un_name);
+			return fn ? this.addEvent(un_name, fn) : this.fireEvent(un_name);
 		};
 	});
 	Native.implement([Element, Document, Window], methods);
@@ -92,7 +108,7 @@ Element.implement({
 	// Data Cache
 	
 	data: function(property, value){
-		return $defined(value) ? this.store(property, value) : this.retrieve(property);
+		return value ? this.store(property, value) : this.retrieve(property);
 	},
 	
 	
@@ -107,7 +123,7 @@ Element.implement({
 				this.set(prop);
 				break;
 			case 'string':
-				if ($defined(value)){
+				if (value){
 					// Note: first attempt() arg is supposed to be index of elements array, but can't be done in Mootools
 					if ($type(value)=='function') value = value.attempt(this, this);
 					this.set(prop, value)
@@ -120,20 +136,20 @@ Element.implement({
 	// HTML
 	
 	html: function(value){
-		return $defined(value) ? this.set('html', value) : this.get('html');
+		return value ? this.set('html', value) : this.get('html');
 	},
 	
 	// Text
 	
 	text: function(text){
-		return $defined(text) ? this.set('text', text) : this.get('text');
+		return text ? this.set('text', text) : this.get('text');
 	},
 	
 	// Value
 	
 	val: function(value){
 		// Note: Array type value not implemented
-		return $defined(value) ? this.set('value', value) : this.get('value');
+		return value ? this.set('value', value) : this.get('value');
 	},
 	
 	
@@ -264,7 +280,7 @@ Element.implement({
 				this.setStyles(property);
 				break;
 			case 'string':
-				if ($defined(value)) this.setStyle(property, value)
+				if (value) this.setStyle(property, value)
 				else return this.getStyle(property);
 		}
 		return this;
@@ -287,19 +303,43 @@ Element.implement({
 	},
 	
 	_scrollTop: function(y){
-		return $defined(y) ? this.scrollTo(this.getScroll().x, y) : this.getScroll().y;
+		return y ? this.scrollTo(this.getScroll().x, y) : this.getScroll().y;
 	},
 	
 	_scrollLeft: function(x){
-		return $defined(x) ? this.scrollTo(x, this.getScroll().y) : this.getScroll().x;
+		return x ? this.scrollTo(x, this.getScroll().y) : this.getScroll().x;
 	},
 	
 	height: function(val){
-		return $defined(val) ? this.setStyle('height', val) : this.getStyle('height').toInt();
+		if (val) return this.setStyle('height', val);
+		var props = {position: 'absolute', visibility: 'hidden', display: 'block'};
+		var value, el = this;
+		var getHeight = function(){
+			value = el.getStyle('height').toInt();
+		}
+		if (this.getStyle('display') == 'none'){
+			$swap(el, props, getHeight);
+		}
+		else {
+			getHeight();
+		}
+		return value;
 	},
 	
 	width: function(val){
-		return $defined(val) ? this.setStyle('width', val) : this.getStyle('width').toInt();
+		if (val) return this.setStyle('width', val);
+		var props = {position: 'absolute', visibility: 'hidden', display: 'block'};
+		var value, el = this;
+		var getWidth = function(){
+			value = el.getStyle('width').toInt();
+		}
+		if (this.getStyle('display') == 'none'){
+			$swap(el, props, getWidth);
+		}
+		else {
+			getWidth();
+		}
+		return value;
 	},
 	
 	innerHeight: function(){
@@ -327,24 +367,156 @@ Element.implement({
 	// Basics
 	
 	show: function(speed, fn){
-		if (this.getStyle('display')=='none')
+		if (this.getStyle('display') == 'none')
 			if (speed){
-				var size = this.setStyles({'width': 'auto', 'height': 'auto'}).getStyles('width', 'height');
-//				console.log(size);
-				var options = {duration: speed};
-				if (fn) options['onComplete'] = function(){
-					fn.attempt(this, this);
-					this.setStyles({'width': 'auto', 'height': 'auto'});
-				};
-				this.setStyles({'width': 0, 'height': 0}).set('morph', options).morph({
-					opacity: [0, 1],
-					width: size.width,
-					height: size.height
+				var currentStyle = this.getStyles('width', 'height', 'overflow');
+				var computedStyle = { 'height': this.height() };
+				var self = this;
+				this.setStyles({
+					'height': 1,
+					'overflow': 'hidden',
+					'display': '',
+					'opacity': 0
+				});
+				// calculate width here in case of width: auto, a little more special than height: auto
+				computedStyle.width = this.width();
+				this.setStyle('width', 1).set('morph', {
+					duration: speed,
+					onComplete: function(){
+						self.setStyles({
+							'width': (currentStyle.width == 'auto') ? '': computedStyle.width,
+							'height': (currentStyle.height == 'auto') ? '': computedStyle.height,
+							'overflow': currentStyle.overflow
+						});
+						if (fn) fn.attempt(self, self);
+					}
+				}).morph({
+					opacity: 1,
+					width: computedStyle.width,
+					height: computedStyle.height
 				});
 			}
 			else
-				this.setStyle('display', 'block');
+				this.setStyle('display', '');
 		return this;
+	},
+	
+	hide: function(speed, fn){
+		if (this.getStyle('display') != 'none')
+			if (speed){
+				var currentStyle = this.getStyles('width', 'height', 'overflow');
+				var self = this;
+				this.setStyles({
+					'overflow': 'hidden'
+				}).set('morph', {
+					duration: speed,
+					onComplete: function(){
+						self.setStyles($extend(currentStyle, {'display': 'none'}));
+						if (fn) fn.attempt(self, self);
+					}
+				}).morph({
+					opacity: 0,
+					width: 0,
+					height: 0
+				});
+			}
+			else
+				this.setStyle('display', 'none');
+		return this;
+	},
+	
+	toggle: function(){
+		return (this.getStyle('display') == 'none') ? this.show() : this.hide();
+	},
+	
+	// Sliding
+	
+	slideDown: function(speed, fn){
+		if (this.getStyle('display') == 'none'){
+			var currentStyle = this.getStyles('height', 'overflow');
+			var computedStyle = { 'height': this.height() };
+			var self = this;
+			this.setStyles({
+				'height': 1,
+				'overflow': 'hidden',
+				'display': 'block',
+			}).set('tween', {
+				duration: speed || 'normal',
+				onComplete: function(){
+					self.setStyles({
+						'height': (currentStyle.height == 'auto') ? '': computedStyle.height,
+						'overflow': currentStyle.overflow
+					});
+					if (fn) fn.attempt(self, self);
+				}
+			}).tween('height', computedStyle.height);
+		}
+		return this;
+	},
+	
+	slideUp: function(speed, fn){
+		if (this.getStyle('display') != 'none'){
+			var currentStyle = this.getStyles('height', 'overflow');
+			var self = this;
+			this.setStyles({
+				'overflow': 'hidden',
+				'display': 'block',
+			}).set('tween', {
+				duration: speed || 'normal',
+				onComplete: function(){
+					self.setStyles($extend(currentStyle, {'display': 'none'}));
+					if (fn) fn.attempt(self, self);
+				}
+			}).tween('height', 0);
+		}
+		return this;
+	},
+	
+	slideToggle: function(speed, fn){
+		return (this.getStyle('display') == 'none') ? this.slideDown() : this.slideUp();
+	},
+	
+	// Fading
+	
+	fadeIn: function(speed, fn){
+		if (this.getStyle('display') == 'none'){
+			var options = {};
+			if (speed) options.duration = speed;
+			if (fn) options.onComplete = fn;
+			this.set('tween', options).fade('hide').setStyle('display', '').fade('in');
+		}
+		return this;
+	},
+	
+	fadeOut: function(speed, fn){
+		if (this.getStyle('display') != 'none'){
+			var options = {};
+			if (speed) options.duration = speed;
+			options.onComplete = function(){
+				this.hide();
+				if (fn) fn.attempt(this, this);
+			}.bind(this);
+			this.set('tween', options).fade('out');
+		}
+		return this;
+	},
+	
+	fadeTo: function(speed, opacity, fn){
+		var options = {};
+		if (speed) options.duration = speed;
+		if (fn) options.onComplete = fn;
+		return this.set('tween', options).fade(opacity);
+	},
+	
+	// Fading
+	
+	animate: function(params, duration, easing, fn){ // no easing.
+		var opts = ($type(duration) == 'object') ? duration : {
+			'duration': duration || 'normal',
+			'transition': easing || 'linear' // defaults to linear instead of sine
+		}
+		if (fn) opts.onComplete = fn;
+		return this.set('morph', opts).morph(params);
 	}
 	
 }).alias({
@@ -386,12 +558,15 @@ Elements.implement({
 	// Removing
 	
 	remove: function(match){
-		if ($defined(match)) this.filter(match).dispose();
+		if (match) this.filter(match).dispose();
 		else return this.dispose();
 		return this;
 	}
 	
 });
 
-// 'normal' are overriden from 500 to 400, 'long' and 'short' are still around
-$extend(Fx.Durations, {'fast': 200, 'normal': 400, 'slow': 600});
+// Durations
+// 'normal' are overriden from 500 to 400
+// added 'default' for the old 500
+// 'long' and 'short' are still around
+$extend(Fx.Durations, {'fast': 200, 'normal': 400, 'slow': 600, 'default': 500});
