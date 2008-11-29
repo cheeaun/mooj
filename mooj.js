@@ -13,7 +13,7 @@ function $swap(el, options, fn){
 	// Revert the old values
 	for(var name in options) el.style[name] = old[name];
 };
-	
+
 Native.implement([Window, Document], {
 
 	/*****   EVENTS   *****/
@@ -538,7 +538,10 @@ Element.implement({
 	getParent: 'parent',
 	getParents: 'parents',
 	getPrevious: 'prev',
-	getAllPrevious: 'prevAll'
+	getAllPrevious: 'prevAll',
+	
+	// AJAX - Misc
+	toQueryString: 'serialize'
 	
 });
 
@@ -570,3 +573,60 @@ Elements.implement({
 // added 'default' for the old 500
 // 'long' and 'short' are still around
 $extend(Fx.Durations, {'fast': 200, 'normal': 400, 'slow': 600, 'default': 500});
+
+	
+/*****   AJAX   *****/
+
+// Ajax Request
+
+$extend($, {
+
+	ajax: function(options){
+		var request;
+		options.method = options.type || options.method || 'get'; // default is 'get' for jQuery
+		if (options.complete) options.onComplete = options.complete;
+		if (options.error) options.onFailure = options.error;
+		if (options.success) options.onSuccess = options.success;
+		if (options.dataType && options.dataType == 'html' && Request.HTML) request = new Request.HTML(options);
+		else if (options.dataType && options.dataType == 'json' && Request.JSON) request = new Request.JSON(options);
+		else request = new Request(options);
+		if (options.timeout) request.cancel.delay(options.timeout);
+		return request.send();
+	},
+	
+	get: function(url, data, fn, type){
+		if ($type(data) == 'function'){
+			fn = data;
+			data = null;
+		}
+		var request;
+		var options = {
+			url: url,
+			data: data,
+			onSuccess: fn,
+			dataType: type
+		};
+		return this.ajax(options);
+	},
+	
+	getJSON: function(url, data, fn){
+		return this.get(url, data, fn, 'json');
+	},
+	
+	post: function(url, data, fn, type){
+		if ($type(data) == 'function'){
+			fn = data;
+			data = null;
+		}
+		var request;
+		var options = {
+			method: 'post',
+			url: url,
+			data: data,
+			onSuccess: fn,
+			dataType: type
+		};
+		return this.ajax(options);
+	}
+	
+});

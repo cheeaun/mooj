@@ -58,6 +58,7 @@ window.addEvent('domready', function(){
 		}).inject(el, 'before');
 		if (code.contains('/*')) runButton.disabled = true;
 		else runButton.addEvent('click', function(e){
+			e.stop();
 			debug(eval(code));
 			document.fireEvent('onSourceChange', this.getPrevious('.example-block').getNext('pre'));
 		});

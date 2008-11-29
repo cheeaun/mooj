@@ -531,6 +531,49 @@ window.unload(function(){
 });</code></pre>
 </div>
 
+<h2>Ajax</h2>
+
+<h3>Ajax Requests</h3>
+<div id="ex-9.1" class="section">
+	<p>Note: <code class="javascript">getScript</code> is not implemented.</p>
+	<h4>Example 9.1: ajax, load, get, getJSON, post</h4>
+	<div class="example-block">
+		<div id="ex-9.1-1">Example text</div>
+	</div>
+	<pre><code class="javascript">$.ajax({
+	url: 'ajax/ajax.txt',
+	success: function(data){
+		$('ex-9.1-1').set('text', data);
+	}
+});</code></pre>
+	<pre><code class="javascript">$('ex-9.1-1').load('ajax/load.txt');</code></pre>
+	<pre><code class="javascript">$.get('ajax/get.txt', function(data){
+	$('ex-9.1-1').set('text', data);
+});</code></pre>
+	<pre><code class="javascript">$.getJSON('ajax/json.txt', function(data){
+	$('ex-9.1-1').set('text', data.text);
+});</code></pre>
+	<pre><code class="javascript">$.post('ajax/post.txt', function(data){
+	$('ex-9.1-1').set('text', data);
+});</code></pre>
+</div>
+
+<h3>Ajax Events</h3>
+<p>Not implemented, yet.</p>
+
+<h3>Misc</h3>
+<div id="ex-9.3" class="section">
+	<p>Note: <code class="javascript">serializeArray</code> is not implemented.</p>
+	<h4>Example 9.3: serialize</h4>
+	<div class="example-block">
+		<form id="ex-9.3-1">
+			<input type="text" name="test-1" value="1" />
+			<input type="text" name="test-2" value="2" />
+		</form>
+	</div>
+	<pre><code class="javascript">$('ex-9.3-1').serialize();</code></pre>
+</div>
+
 <div id="debug">
 <div id="debug-log"></div>
 <div id="debug-foot">
