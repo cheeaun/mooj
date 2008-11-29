@@ -579,7 +579,7 @@ $extend(Fx.Durations, {'fast': 200, 'normal': 400, 'slow': 600, 'default': 500})
 
 // Ajax Request
 
-$extend($, {
+$.extend({
 
 	ajax: function(options){
 		var request;
