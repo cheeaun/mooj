@@ -574,6 +574,28 @@ Elements.implement({
 // 'long' and 'short' are still around
 $extend(Fx.Durations, {'fast': 200, 'normal': 400, 'slow': 600, 'default': 500});
 
+
+/*****   SELECTORS   *****/
+
+Selectors.Pseudo.extend({
+
+	// Form Filters
+
+	enabled: function(){
+		return !this.disabled;
+	},
+
+	disabled: function(){
+		return this.disabled;
+	},
+	
+	// http://davidwalsh.name/create-custom-pseudo-selector-mootools-selected
+	selected: function(){
+		return this.selected;
+	}
+
+});
+
 	
 /*****   AJAX   *****/
 
