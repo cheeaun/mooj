@@ -159,7 +159,8 @@ Element.implement({
 	// Finding
 	
 	siblings: function(match){
-		return $$( this.getAllNext(match), this.getAllPrevious(match) );
+		// solution from http://mootools.lighthouseapp.com/projects/2706/tickets/465-elementgetallsiblings#ticket-465-4
+		return this.getParent().getChildren(match).erase(this);
 	},
 	
 	
